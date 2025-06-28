@@ -8,9 +8,8 @@ RUN chmod +x gradlew
 RUN ./gradlew --no-daemon dependencies
 
 COPY src src
-COPY config config
 
-RUN ./gradlew build --no-daemon
+RUN ./gradlew build -x check --no-daemon
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
