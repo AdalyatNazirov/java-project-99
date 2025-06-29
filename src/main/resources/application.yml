@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: app
+  jpa:
+    hibernate:
+      ddl-auto: update
+  output:
+    ansi:
+      enabled: always

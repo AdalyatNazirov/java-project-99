@@ -1,0 +1,6 @@
+spring:
+  jpa:
+    show-sql: false
+
+  datasource:
+    url: ${DATABASE_URL}
