@@ -4,9 +4,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-  output:
-    ansi:
-      enabled: always
 
 server:
   address: 0.0.0.0

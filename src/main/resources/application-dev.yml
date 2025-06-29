@@ -1,4 +1,8 @@
 spring:
+  output:
+    ansi:
+      enabled: always
+
   jpa:
     show-sql: true
 
