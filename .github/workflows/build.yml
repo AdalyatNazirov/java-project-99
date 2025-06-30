@@ -1,4 +1,4 @@
-name: Task Manager
+name: Task Manager Build Task
 on:
   push:
     branches:
@@ -35,9 +35,6 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
 
       - name: Build and analyze
-        run: ./gradlew build
-
-      - name: Sonar
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonar --info --stacktrace
+        run: ./gradlew build sonar --info
