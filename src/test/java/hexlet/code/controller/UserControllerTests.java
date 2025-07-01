@@ -5,6 +5,7 @@ import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
+import net.datafaker.Faker;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,8 @@ public class UserControllerTests {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private Faker faker;
 
     @BeforeEach
     public void setUp() {
@@ -156,8 +159,7 @@ public class UserControllerTests {
 
         var dto = new HashMap<String, Object>();
 
-        dto.put("email", "a@b.c");
-        dto.put("firstName", null);
+        dto.put("email", faker.internet().emailAddress());
 
         var request = put("/api/users/{id}", testUser.getId())
                 .contentType(MediaType.APPLICATION_JSON)
