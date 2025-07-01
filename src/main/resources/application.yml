@@ -3,7 +3,8 @@ spring:
     name: app
   jpa:
     hibernate:
-      ddl-auto: update
+#      ddl-auto: update
+      ddl-auto: create-drop
 
 server:
   address: 0.0.0.0

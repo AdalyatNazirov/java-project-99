@@ -35,7 +35,7 @@ public class User {
     private String lastName;
 
     @Email
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
     @NotBlank
