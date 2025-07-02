@@ -46,8 +46,6 @@ public class UserController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO create(@RequestBody UserCreateDTO userCreateDto) {
-        userMapper.encryptPassword(userCreateDto);
-
         var user = userMapper.map(userCreateDto);
         var result = userRepository.save(user);
 
