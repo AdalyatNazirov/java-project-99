@@ -1,7 +1,10 @@
 package hexlet.code.component;
 
+import hexlet.code.dto.TaskStatusCreateDTO;
 import hexlet.code.dto.UserCreateDTO;
+import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.mapper.UserMapper;
+import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,17 +12,30 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 @Component
 @AllArgsConstructor
 public class DataInitializer implements ApplicationRunner {
 
-
+    private final Map<String, String> defaultStatuses = new LinkedHashMap<>() {
+        {
+            put("draft", "Draft");
+            put("to_review", "To Review");
+            put("to_be_fixed", "To Be Fixed");
+            put("to_publish", "To Publish");
+            put("published", "Published");
+        }
+    };
     @Autowired
-    private final UserRepository userRepository;
-
+    private UserRepository userRepository;
     @Autowired
-    private final UserMapper userMapper;
-
+    private UserMapper userMapper;
+    @Autowired
+    private TaskStatusRepository taskStatusRepository;
+    @Autowired
+    private TaskStatusMapper taskStatusMapper;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -30,5 +46,11 @@ public class DataInitializer implements ApplicationRunner {
         userData.setPasswordDigest("qwerty");
         var user = userMapper.map(userData);
         userRepository.save(user);
+
+        var taskStatuses = defaultStatuses.entrySet().stream()
+                .map(entry -> new TaskStatusCreateDTO(entry.getValue(), entry.getKey()))
+                .map(taskStatusMapper::map)
+                .toList();
+        taskStatusRepository.saveAll(taskStatuses);
     }
 }
