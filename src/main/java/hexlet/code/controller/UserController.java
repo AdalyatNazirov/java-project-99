@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("${base-url:/api}" + "/users")
 public class UserController {
 
     @Autowired
