@@ -6,11 +6,10 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -20,28 +19,27 @@ import java.time.Instant;
 @Entity
 @Getter
 @Setter
-@Table(name = "task_statuses")
+@Table(name = "tasks")
 @EntityListeners(AuditingEntityListener.class)
-@NoArgsConstructor
-@AllArgsConstructor
-public class TaskStatus implements BaseEntity {
+public class Task implements BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(unique = true)
-    @NotBlank
+    @Column(nullable = false)
+    @Size(min = 1)
     private String name;
 
-    @Column(unique = true)
-    @NotBlank
-    private String slug;
+    private Integer index;
+
+    private String description;
+
+    @ManyToOne
+    private TaskStatus taskStatus;
+
+    @ManyToOne
+    private User assignee;
 
     @CreatedDate
     private Instant createdAt;
-
-    public TaskStatus(String name, String slug) {
-        this.name = name;
-        this.slug = slug;
-    }
 }
