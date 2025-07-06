@@ -3,7 +3,7 @@ spring:
     name: app
   jpa:
     hibernate:
-#      ddl-auto: update
+      #      ddl-auto: update
       ddl-auto: create-drop
 
 server:
@@ -15,3 +15,9 @@ rsa:
   public-key: classpath:certs/public.pem
 
 base-url: /api
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
