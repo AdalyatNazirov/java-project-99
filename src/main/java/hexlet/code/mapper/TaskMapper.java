@@ -12,7 +12,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
-        uses = {JsonNullableMapper.class, ReferenceMapper.class, SlugMapper.class},
+        uses = {JsonNullableMapper.class, ReferenceMapper.class, SlugMapper.class, DateMapper.class},
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
@@ -24,6 +24,7 @@ public abstract class TaskMapper {
 
     @Mapping(target = "assigneeId", source = "assignee.id")
     @Mapping(target = "status", source = "taskStatus.slug")
+    @Mapping(source = "createdAt", target = "createdAt", qualifiedByName = "instantToLocalDate")
     public abstract TaskDTO map(Task model);
 
     @Mapping(target = "assignee.id", source = "assigneeId")
