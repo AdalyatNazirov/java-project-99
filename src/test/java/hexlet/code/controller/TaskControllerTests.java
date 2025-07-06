@@ -5,9 +5,11 @@ import hexlet.code.dto.TaskCreateDTO;
 import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.mapper.TaskStatusMapper;
+import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
+import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
@@ -27,6 +29,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,6 +63,7 @@ public class TaskControllerTests {
     private Task testTask;
     private TaskStatus testTaskStatus;
     private User testUser;
+    private Label testLabel;
 
     @Autowired
     private ModelGenerator modelGenerator;
@@ -75,6 +79,8 @@ public class TaskControllerTests {
 
     @Autowired
     private Faker faker;
+    @Autowired
+    private LabelRepository labelRepository;
 
     @BeforeEach
     public void setUp() {
@@ -88,6 +94,9 @@ public class TaskControllerTests {
 
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
         userRepository.save(testUser);
+
+        testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        labelRepository.save(testLabel);
 
         testTask = Instancio.of(modelGenerator.getTaskModel()).create();
         testTask.setTaskStatus(testTaskStatus);
@@ -161,6 +170,39 @@ public class TaskControllerTests {
     }
 
     @Test
+    public void testCreateWithLabel() throws Exception {
+        var taskCreateDTO = new TaskCreateDTO();
+        taskCreateDTO.setName("Test Task");
+        taskCreateDTO.setDescription("Test Description");
+        taskCreateDTO.setStatus(testTaskStatus.getSlug());
+        taskCreateDTO.setAssigneeId(testUser.getId());
+        taskCreateDTO.setLabelIds(new HashSet<>() {{
+            add(testLabel.getId());
+        }});
+
+        var request = post("/api/tasks").with(jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(taskCreateDTO));
+
+        mockMvc.perform(request)
+                .andExpect(status().isCreated());
+
+        var tasks = taskRepository.findAll();
+        var task = tasks.stream()
+                .filter(t -> t.getName().equals("Test Task"))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo(taskCreateDTO.getName());
+        assertThat(task.getDescription()).isEqualTo(taskCreateDTO.getDescription());
+        assertThat(task.getTaskStatus().getSlug()).isEqualTo(taskCreateDTO.getStatus());
+        assertThat(task.getAssignee().getId()).isEqualTo(taskCreateDTO.getAssigneeId());
+        assertThat(task.getLabels()).hasSize(1);
+        assertThat(task.getLabels().iterator().next().getId()).isEqualTo(testLabel.getId());
+    }
+
+    @Test
     public void testUpdate() throws Exception {
         taskRepository.save(testTask);
 
@@ -183,6 +225,30 @@ public class TaskControllerTests {
 
     @Test
     public void testPartialUpdate() throws Exception {
+        taskRepository.save(testTask);
+        var newLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        labelRepository.save(newLabel);
+
+        var dto = new HashMap<String, Object>();
+        dto.put("taskLabelIds", new HashSet<>() {{
+            add(newLabel.getId());
+        }});
+
+        var request = put("/api/tasks/{id}", testTask.getId()).with(jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(dto));
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk());
+
+        var updatedTask = taskRepository.findById(testTask.getId()).get();
+
+        assertThat(updatedTask.getLabels()).hasSize(1);
+        assertThat(updatedTask.getLabels().iterator().next().getId()).isEqualTo(newLabel.getId());
+    }
+
+    @Test
+    public void testUpdateLabels() throws Exception {
         taskRepository.save(testTask);
 
         var dto = new HashMap<String, Object>();

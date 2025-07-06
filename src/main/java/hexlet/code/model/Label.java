@@ -6,46 +6,40 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "tasks")
+@Table(name = "labels")
 @EntityListeners(AuditingEntityListener.class)
-public class Task implements BaseEntity {
+@AllArgsConstructor
+@NoArgsConstructor
+public class Label implements BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false)
-    @Size(min = 1)
+    @NotBlank
+    @Column(unique = true)
+    @Size(min = 3, max = 1000)
     private String name;
-
-    private Integer index;
-
-    private String description;
-
-    @ManyToOne
-    private TaskStatus taskStatus;
-
-    @ManyToOne
-    private User assignee;
 
     @CreatedDate
     private Instant createdAt;
 
-    @ManyToMany
-    private List<Label> labels = new ArrayList<>();
+    public Label(String name) {
+        this.name = name;
+    }
 }
