@@ -43,7 +43,9 @@ public abstract class TaskMapper {
 
 
     protected List<Label> mapLabelIds(Set<Long> labelIds) {
-        if (labelIds == null) return new ArrayList<>();
+        if (labelIds == null) {
+            return new ArrayList<>();
+        }
         return labelIds.stream()
                 .map(id -> {
                     Label label = new Label();
@@ -54,7 +56,9 @@ public abstract class TaskMapper {
     }
 
     protected Set<Long> mapLabels(List<Label> labels) {
-        if (labels == null) return new HashSet<>();
+        if (labels == null) {
+            return new HashSet<>();
+        }
         return labels.stream()
                 .map(Label::getId)
                 .collect(Collectors.toSet());
