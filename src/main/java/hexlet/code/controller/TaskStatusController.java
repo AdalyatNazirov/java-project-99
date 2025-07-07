@@ -6,6 +6,7 @@ import hexlet.code.dto.TaskStatusUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.repository.TaskStatusRepository;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,14 +51,14 @@ public class TaskStatusController {
 
     @PostMapping
     @ResponseStatus(org.springframework.http.HttpStatus.CREATED)
-    public TaskStatusDTO create(@RequestBody TaskStatusCreateDTO taskStatusCreateDto) {
+    public TaskStatusDTO create(@Valid @RequestBody TaskStatusCreateDTO taskStatusCreateDto) {
         var taskStatus = taskStatusMapper.map(taskStatusCreateDto);
         var result = taskStatusRepository.save(taskStatus);
         return taskStatusMapper.map(result);
     }
 
     @PutMapping("/{id}")
-    public TaskStatusDTO update(@PathVariable Long id, @RequestBody TaskStatusUpdateDTO taskStatusUpdateDto) {
+    public TaskStatusDTO update(@PathVariable Long id, @Valid @RequestBody TaskStatusUpdateDTO taskStatusUpdateDto) {
         var taskStatus = taskStatusRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task Status not found"));

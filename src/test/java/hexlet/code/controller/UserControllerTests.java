@@ -106,6 +106,20 @@ public class UserControllerTests {
     @Test
     public void testCreate() throws Exception {
 
+        var anotherUser = Instancio.of(modelGenerator.getUserModel()).create();
+        anotherUser.setPasswordDigest(null);
+
+        var request = post("/api/users").with(jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(anotherUser));
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void failedCreateWithNullPassword() throws Exception {
+
         var request = post("/api/users").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(testUser));

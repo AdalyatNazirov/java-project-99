@@ -6,6 +6,7 @@ import hexlet.code.dto.UserUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +49,7 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDTO create(@RequestBody UserCreateDTO userCreateDto) {
+    public UserDTO create(@Valid @RequestBody UserCreateDTO userCreateDto) {
         var user = userMapper.map(userCreateDto);
         var result = userRepository.save(user);
 
@@ -62,7 +63,7 @@ public class UserController {
     }
 
     @PutMapping(path = "/{id}")
-    public UserDTO update(@PathVariable Long id, @RequestBody UserUpdateDTO userUpdateDto) {
+    public UserDTO update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO userUpdateDto) {
         var user = userRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
