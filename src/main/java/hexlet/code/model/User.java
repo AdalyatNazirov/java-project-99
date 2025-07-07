@@ -1,6 +1,5 @@
 package hexlet.code.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import hexlet.code.util.DateStringToInstantDeserializer;
 import jakarta.persistence.Column;
