@@ -1,5 +1,6 @@
 package hexlet.code.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ import java.util.Set;
 public class TaskDTO {
     private Long id;
     @JsonProperty("title")
+    @JsonAlias({"name"})
     private String name;
     private Integer index;
     @JsonProperty("content")

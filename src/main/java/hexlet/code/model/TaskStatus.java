@@ -1,5 +1,7 @@
 package hexlet.code.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import hexlet.code.util.DateStringToInstantDeserializer;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -38,6 +40,7 @@ public class TaskStatus implements BaseEntity {
     private String slug;
 
     @CreatedDate
+    @JsonDeserialize(using = DateStringToInstantDeserializer.class)
     private Instant createdAt;
 
     public TaskStatus(String name, String slug) {
