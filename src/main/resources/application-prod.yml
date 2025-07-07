@@ -6,7 +6,7 @@ spring:
     url: ${JDBC_DATABASE_URL}
 
 sentry:
-  dsn: https://98b21773e4956318ed749c091d794f89@o4509628673425408.ingest.de.sentry.io/4509628684435536
+  dsn: ${SENTRY_DSN}
   # Add data like request headers and IP for users,
   # see https://docs.sentry.io/platforms/java/guides/spring-boot/data-management/data-collected/ for more info
   send-default-pii: true
