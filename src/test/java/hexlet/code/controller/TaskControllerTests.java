@@ -3,8 +3,6 @@ package hexlet.code.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.TaskCreateDTO;
 import hexlet.code.dto.TaskUpdateDTO;
-import hexlet.code.mapper.TaskMapper;
-import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
@@ -14,7 +12,6 @@ import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
-import net.datafaker.Faker;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,14 +69,6 @@ public class TaskControllerTests {
     private ObjectMapper om;
 
     @Autowired
-    private TaskMapper taskMapper;
-
-    @Autowired
-    private TaskStatusMapper taskStatusMapper;
-
-    @Autowired
-    private Faker faker;
-    @Autowired
     private LabelRepository labelRepository;
 
     @BeforeEach
@@ -89,14 +78,12 @@ public class TaskControllerTests {
                 .apply(springSecurity())
                 .build();
 
-        testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
-        taskStatusRepository.save(testTaskStatus);
+        testTaskStatus = taskStatusRepository.findBySlug("draft").get();
 
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
         userRepository.save(testUser);
 
-        testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
-        labelRepository.save(testLabel);
+        testLabel = labelRepository.findByName("bug").get();
 
         testTask = Instancio.of(modelGenerator.getTaskModel()).create();
         testTask.setTaskStatus(testTaskStatus);
@@ -112,6 +99,47 @@ public class TaskControllerTests {
 
         var body = result.getResponse().getContentAsString();
         assertThatJson(body).isArray();
+    }
+
+    @Test
+    public void testListWithFilter() throws Exception {
+        taskRepository.save(testTask);
+
+        var anotherStatus = taskStatusRepository.findBySlug("to_review").get();
+
+        var anotherTask = Instancio.of(modelGenerator.getTaskModel()).create();
+        anotherTask.setTaskStatus(anotherStatus);
+        anotherTask.setAssignee(testUser);
+        taskRepository.save(anotherTask);
+
+        var result = mockMvc.perform(get("/api/tasks?assigneeId=" + testUser.getId() + "&status=" + testTaskStatus.getSlug()).with(jwt()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var body = result.getResponse().getContentAsString();
+        assertThatJson(body).isArray().hasSize(1);
+        assertThatJson(body).node("[0].status").isEqualTo(testTaskStatus.getSlug());
+        assertThatJson(body).node("[0].assignee_id").isEqualTo(testUser.getId());
+    }
+
+    @Test
+    public void testListWithLabelWilter() throws Exception {
+        taskRepository.save(testTask);
+
+        var anotherTask = Instancio.of(modelGenerator.getTaskModel()).create();
+        anotherTask.setTaskStatus(testTaskStatus);
+        anotherTask.setAssignee(testUser);
+        anotherTask.getLabels().addAll(labelRepository.findAll());
+        taskRepository.save(anotherTask);
+
+        var result = mockMvc.perform(get("/api/tasks?labelId=" + testLabel.getId()).with(jwt()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var body = result.getResponse().getContentAsString();
+        assertThatJson(body).isArray().hasSize(1);
+        assertThatJson(body).node("[0].status").isEqualTo(testTaskStatus.getSlug());
+        assertThatJson(body).node("[0].assignee_id").isEqualTo(testUser.getId());
     }
 
     @Test

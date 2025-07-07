@@ -2,10 +2,12 @@ package hexlet.code.controller;
 
 import hexlet.code.dto.TaskCreateDTO;
 import hexlet.code.dto.TaskDTO;
+import hexlet.code.dto.TaskListDTO;
 import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.repository.TaskRepository;
+import hexlet.code.specification.TaskSpecification;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +32,12 @@ public class TaskController {
 
     private TaskMapper taskMapper;
 
+    private TaskSpecification taskSpecification;
+
     @GetMapping
-    public ResponseEntity<List<TaskDTO>> list() {
-        var tasks = taskRepository.findAll()
+    public ResponseEntity<List<TaskDTO>> list(TaskListDTO params) {
+        var spec = taskSpecification.build(params);
+        var tasks = taskRepository.findAll(spec)
                 .stream()
                 .map(taskMapper::map)
                 .toList();
