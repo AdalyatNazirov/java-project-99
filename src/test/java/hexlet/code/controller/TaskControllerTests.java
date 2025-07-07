@@ -112,7 +112,9 @@ public class TaskControllerTests {
         anotherTask.setAssignee(testUser);
         taskRepository.save(anotherTask);
 
-        var result = mockMvc.perform(get("/api/tasks?assigneeId=" + testUser.getId() + "&status=" + testTaskStatus.getSlug()).with(jwt()))
+        var result = mockMvc.perform(get("/api/tasks"
+                                         + "?assigneeId=" + testUser.getId()
+                                         + "&status=" + testTaskStatus.getSlug()).with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn();
 
