@@ -45,6 +45,7 @@ public class ModelGenerator {
 
         taskModel = Instancio.of(Task.class)
                 .ignore(Select.field(Task::getId))
+                .ignore(Select.field(Task::getLabels))
                 .supply(Select.field(Task::getName), () -> faker.lorem().word())
                 .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
                 .toModel();
