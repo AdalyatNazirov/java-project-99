@@ -13,6 +13,6 @@ public class TaskStatusCreateDTO {
     @NotBlank
     private String name;
     @NotBlank
-    @Pattern(regexp = "^[a-zA-Z0-9-]+$")
+    @Pattern(regexp = "^[a-zA-Z0-9-_]+$")
     private String slug;
 }

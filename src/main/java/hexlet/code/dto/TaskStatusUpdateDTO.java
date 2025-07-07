@@ -10,6 +10,7 @@ public class TaskStatusUpdateDTO {
     @NotBlank
     private JsonNullable<String> name;
 
-    @Pattern(regexp = "^[a-zA-Z0-9-]+$")
+    @NotBlank
+    @Pattern(regexp = "^[a-zA-Z0-9-_]+$")
     private JsonNullable<String> slug;
 }
