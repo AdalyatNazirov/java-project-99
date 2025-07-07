@@ -1,5 +1,6 @@
 package hexlet.code.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -15,5 +16,6 @@ public class UserCreateDTO {
     private String email;
     @NotBlank
     @Size(min = 3, max = 100)
+    @JsonProperty("password")
     private String passwordDigest;
 }

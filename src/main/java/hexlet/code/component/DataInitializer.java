@@ -47,24 +47,30 @@ public class DataInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        var userData = new UserCreateDTO();
-        userData.setFirstName("First");
-        userData.setLastName("Last");
-        userData.setEmail("hexlet@example.com");
-        userData.setPasswordDigest("qwerty");
-        var user = userMapper.map(userData);
-        userRepository.save(user);
+        if (userRepository.findByEmail("hexlet@example.com").isEmpty()) {
+            var userData = new UserCreateDTO();
+            userData.setFirstName("First");
+            userData.setLastName("Last");
+            userData.setEmail("hexlet@example.com");
+            userData.setPasswordDigest("qwerty");
+            var user = userMapper.map(userData);
+            userRepository.save(user);
+        }
 
-        var taskStatuses = defaultStatuses.entrySet().stream()
-                .map(entry -> new TaskStatusCreateDTO(entry.getValue(), entry.getKey()))
-                .map(taskStatusMapper::map)
-                .toList();
-        taskStatusRepository.saveAll(taskStatuses);
+        if (taskStatusRepository.findAll().isEmpty()) {
+            var taskStatuses = defaultStatuses.entrySet().stream()
+                    .map(entry -> new TaskStatusCreateDTO(entry.getValue(), entry.getKey()))
+                    .map(taskStatusMapper::map)
+                    .toList();
+            taskStatusRepository.saveAll(taskStatuses);
+        }
 
-        var labels = Arrays.stream(new String[]{"feature", "bug"})
-                .map(label -> new LabelCreateDTO(label))
-                .map(labelMapper::map)
-                .toList();
-        labelRepository.saveAll(labels);
+        if (labelRepository.findAll().isEmpty()) {
+            var labels = Arrays.stream(new String[]{"feature", "bug"})
+                    .map(LabelCreateDTO::new)
+                    .map(labelMapper::map)
+                    .toList();
+            labelRepository.saveAll(labels);
+        }
     }
 }
