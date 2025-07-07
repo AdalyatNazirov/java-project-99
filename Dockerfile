@@ -1,4 +1,5 @@
 FROM eclipse-temurin:21-jdk AS build
+ARG SENTRY_AUTH_TOKEN
 WORKDIR /app
 COPY gradlew .
 COPY gradle gradle
@@ -12,6 +13,8 @@ COPY src src
 RUN ./gradlew build -x check --no-daemon
 
 FROM eclipse-temurin:21-jre
+ARG SENTRY_AUTH_TOKEN
+ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
 WORKDIR /app
 ENV JAVA_OPTS="-Xmx256m -Xms128m -XX:+UseSerialGC -XX:MaxMetaspaceSize=128m"
 
