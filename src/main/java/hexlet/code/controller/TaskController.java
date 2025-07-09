@@ -8,6 +8,7 @@ import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.specification.TaskSpecification;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,14 +58,14 @@ public class TaskController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TaskDTO create(@RequestBody TaskCreateDTO taskDto) {
+    public TaskDTO create(@Valid @RequestBody TaskCreateDTO taskDto) {
         var task = taskMapper.map(taskDto);
         var result = taskRepository.save(task);
         return taskMapper.map(result);
     }
 
     @PutMapping("/{id}")
-    public TaskDTO update(@PathVariable Long id, @RequestBody TaskUpdateDTO taskUpdateDto) {
+    public TaskDTO update(@PathVariable Long id, @Valid @RequestBody TaskUpdateDTO taskUpdateDto) {
         var task = taskRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task with id " + id + " not found"));

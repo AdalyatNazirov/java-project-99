@@ -22,6 +22,6 @@ public class UserUtils {
 
     public boolean isCurrentUser(long userId) {
         var user = getCurrentUser();
-        return user.getId() == userId;
+        return user != null && user.getId() == userId;
     }
 }

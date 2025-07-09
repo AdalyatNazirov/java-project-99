@@ -6,6 +6,7 @@ import hexlet.code.dto.LabelUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.LabelMapper;
 import hexlet.code.repository.LabelRepository;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,14 +52,14 @@ public class LabelController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public LabelDTO create(@RequestBody LabelCreateDTO labelDto) {
+    public LabelDTO create(@Valid @RequestBody LabelCreateDTO labelDto) {
         var label = labelMapper.map(labelDto);
         var result = labelRepository.save(label);
         return labelMapper.map(result);
     }
 
     @PutMapping("/{id}")
-    public LabelDTO update(@PathVariable Long id, @RequestBody LabelUpdateDTO labelDto) {
+    public LabelDTO update(@PathVariable Long id, @Valid @RequestBody LabelUpdateDTO labelDto) {
         var label = labelRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Label with id " + id + " not found"));

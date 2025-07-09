@@ -168,7 +168,7 @@ public class TaskControllerTests {
                 .andExpect(status().isNotFound())
                 .andReturn();
 
-        assertThat(result.getResponse().getContentAsString()).isEqualTo("Task not found");
+        assertThat(result.getResponse().getContentAsString()).isEqualTo("Task with id 10000000 not found");
     }
 
     @Test

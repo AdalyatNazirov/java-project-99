@@ -58,6 +58,6 @@ public class AuthenticationControllerTests {
                 .andReturn();
 
         var body = result.getResponse().getContentAsString();
-        assertThat(body).isBlank();
+        assertThat(body).isEqualTo("Invalid credentials");
     }
 }

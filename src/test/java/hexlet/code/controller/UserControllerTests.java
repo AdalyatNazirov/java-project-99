@@ -100,7 +100,7 @@ public class UserControllerTests {
                 .andExpect(status().isNotFound())
                 .andReturn();
 
-        assertThat(result.getResponse().getContentAsString()).isEqualTo("User not found");
+        assertThat(result.getResponse().getContentAsString()).isEqualTo("User with id 11 not found");
     }
 
     @Test
@@ -140,7 +140,8 @@ public class UserControllerTests {
     public void testDestroy() throws Exception {
         var user = userRepository.save(testUser);
 
-        mockMvc.perform(delete("/api/users/" + user.getId()).with(jwt()))
+        mockMvc.perform(delete("/api/users/" + user.getId())
+                        .with(jwt().jwt(builder -> builder.subject(user.getEmail()))))
                 .andExpect(status().isNoContent())
                 .andReturn();
 
@@ -148,18 +149,20 @@ public class UserControllerTests {
     }
 
     @Test
-    public void testDestroyWhenNotExists() throws Exception {
+    public void failDestroyWhenOtherUserId() throws Exception {
+        var user = userRepository.save(testUser);
+
         Long id = 11L;
         assertThat(userRepository.findById(id)).isEmpty();
 
-        mockMvc.perform(delete("/api/users/" + id).with(jwt()))
-                .andExpect(status().isNoContent())
-                .andReturn();
+        mockMvc.perform(delete("/api/users/" + id)
+                        .with(jwt().jwt(builder -> builder.subject(user.getEmail()))))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     public void testUpdate() throws Exception {
-        userRepository.save(testUser);
+        var user = userRepository.save(testUser);
 
         var dto = userMapper.map(testUser);
 
@@ -167,39 +170,60 @@ public class UserControllerTests {
         dto.setLastName("NewLastName");
         dto.setEmail("a@b.c");
 
-        var request = put("/api/users/{id}", testUser.getId()).with(jwt())
+        var request = put("/api/users/{id}", testUser.getId())
+                .with(jwt().jwt(builder -> builder.subject(user.getEmail())))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
 
         mockMvc.perform(request)
                 .andExpect(status().isOk());
 
-        var user = userRepository.findById(testUser.getId()).get();
+        var updated_user = userRepository.findById(testUser.getId()).get();
 
-        assertThat(user.getFirstName()).isEqualTo(dto.getFirstName());
-        assertThat(user.getLastName()).isEqualTo(dto.getLastName());
-        assertThat(user.getEmail()).isEqualTo(dto.getEmail());
+        assertThat(updated_user.getFirstName()).isEqualTo(dto.getFirstName());
+        assertThat(updated_user.getLastName()).isEqualTo(dto.getLastName());
+        assertThat(updated_user.getEmail()).isEqualTo(dto.getEmail());
+    }
+
+    @Test
+    public void failUpdateOtherUser() throws Exception {
+        var user = userRepository.save(testUser);
+
+        var dto = userMapper.map(testUser);
+
+        dto.setFirstName("NewFirstName");
+        dto.setLastName("NewLastName");
+        dto.setEmail("a@b.c");
+
+        var request = put("/api/users/{id}", 11)
+                .with(jwt().jwt(builder -> builder.subject(user.getEmail())))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(dto));
+
+        mockMvc.perform(request)
+                .andExpect(status().isForbidden());
     }
 
     @Test
     public void testPartialUpdate() throws Exception {
-        userRepository.save(testUser);
+        User user = userRepository.save(testUser);
 
         var dto = new HashMap<String, Object>();
 
         dto.put("email", faker.internet().emailAddress());
 
-        var request = put("/api/users/{id}", testUser.getId()).with(jwt())
+        var request = put("/api/users/{id}", testUser.getId())
+                .with(jwt().jwt(builder -> builder.subject(user.getEmail())))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto));
 
         mockMvc.perform(request)
                 .andExpect(status().isOk());
 
-        var user = userRepository.findById(testUser.getId()).get();
+        var updated_user = userRepository.findById(testUser.getId()).get();
 
-        assertThat(user.getFirstName()).isEqualTo(testUser.getFirstName());
-        assertThat(user.getLastName()).isEqualTo(testUser.getLastName());
-        assertThat(user.getEmail()).isEqualTo(dto.get("email"));
+        assertThat(updated_user.getFirstName()).isEqualTo(testUser.getFirstName());
+        assertThat(updated_user.getLastName()).isEqualTo(testUser.getLastName());
+        assertThat(updated_user.getEmail()).isEqualTo(dto.get("email"));
     }
 }

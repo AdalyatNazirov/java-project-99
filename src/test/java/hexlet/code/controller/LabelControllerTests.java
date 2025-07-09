@@ -101,7 +101,7 @@ public class LabelControllerTests {
                 .andExpect(status().isNotFound())
                 .andReturn();
 
-        assertThat(result.getResponse().getContentAsString()).isEqualTo("Label not found");
+        assertThat(result.getResponse().getContentAsString()).isEqualTo("Label with id 10000000 not found");
     }
 
     @Test

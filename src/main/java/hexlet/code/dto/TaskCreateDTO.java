@@ -2,11 +2,13 @@ package hexlet.code.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
 import lombok.Data;
 
 import java.util.Set;
 
 @Data
+@Valid
 public class TaskCreateDTO {
     @JsonProperty("title")
     @JsonAlias({"name"})
