@@ -178,11 +178,11 @@ public class UserControllerTests {
         mockMvc.perform(request)
                 .andExpect(status().isOk());
 
-        var updated_user = userRepository.findById(testUser.getId()).get();
+        var updatedUser = userRepository.findById(testUser.getId()).get();
 
-        assertThat(updated_user.getFirstName()).isEqualTo(dto.getFirstName());
-        assertThat(updated_user.getLastName()).isEqualTo(dto.getLastName());
-        assertThat(updated_user.getEmail()).isEqualTo(dto.getEmail());
+        assertThat(updatedUser.getFirstName()).isEqualTo(dto.getFirstName());
+        assertThat(updatedUser.getLastName()).isEqualTo(dto.getLastName());
+        assertThat(updatedUser.getEmail()).isEqualTo(dto.getEmail());
     }
 
     @Test
@@ -220,10 +220,10 @@ public class UserControllerTests {
         mockMvc.perform(request)
                 .andExpect(status().isOk());
 
-        var updated_user = userRepository.findById(testUser.getId()).get();
+        var updatedUser = userRepository.findById(testUser.getId()).get();
 
-        assertThat(updated_user.getFirstName()).isEqualTo(testUser.getFirstName());
-        assertThat(updated_user.getLastName()).isEqualTo(testUser.getLastName());
-        assertThat(updated_user.getEmail()).isEqualTo(dto.get("email"));
+        assertThat(updatedUser.getFirstName()).isEqualTo(testUser.getFirstName());
+        assertThat(updatedUser.getLastName()).isEqualTo(testUser.getLastName());
+        assertThat(updatedUser.getEmail()).isEqualTo(dto.get("email"));
     }
 }
