@@ -1,0 +1,35 @@
+---
+logging:
+  level:
+    root: WARN
+    org:
+      springframework:
+        # web: DEBUG
+        security: DEBUG
+
+spring:
+  jackson:
+    default-property-inclusion: non_null
+    # mapper:
+     # nullable: true
+    serialization:
+      indent_output: true
+  instancio:
+    bean:
+      validation:
+        enabled: true
+
+  jpa:
+    show-sql: true
+
+  output:
+    ansi:
+      enabled: always
+#  datasource:
+#    # username: ""
+#    # password: ""
+#    url: "jdbc:h2:mem:dbname;DB_CLOSE_ON_EXIT=FALSE"
+
+rsa:
+  private-key: classpath:certs/private.pem
+  public-key: classpath:certs/public.pem
