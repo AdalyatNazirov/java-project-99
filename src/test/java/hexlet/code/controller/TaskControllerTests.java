@@ -1,8 +1,11 @@
 package hexlet.code.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.TaskCreateDTO;
+import hexlet.code.dto.TaskDTO;
 import hexlet.code.dto.TaskUpdateDTO;
+import hexlet.code.mapper.TaskMapper;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
@@ -27,6 +30,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,6 +54,9 @@ public class TaskControllerTests {
 
     @Autowired
     private TaskRepository taskRepository;
+
+    @Autowired
+    private TaskMapper taskMapper;
 
     @Autowired
     private TaskStatusRepository taskStatusRepository;
@@ -97,8 +104,13 @@ public class TaskControllerTests {
                 .andExpect(status().isOk())
                 .andReturn();
 
+        var expected = taskRepository.findAll().stream().map(taskMapper::map).toList();
         var body = result.getResponse().getContentAsString();
-        assertThatJson(body).isArray();
+        assertThatJson(body).isArray().hasSize(expected.size());
+
+        List<TaskDTO> userDTOs = om.readValue(body, new TypeReference<>() {
+        });
+        assertThat(userDTOs).containsExactlyInAnyOrderElementsOf(expected);
     }
 
     @Test

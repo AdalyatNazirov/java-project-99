@@ -1,6 +1,9 @@
 package hexlet.code.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.dto.TaskStatusDTO;
+import hexlet.code.dto.UserDTO;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.TaskStatusRepository;
@@ -20,6 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,8 +78,13 @@ public class TaskStatusControllerTests {
                 .andExpect(status().isOk())
                 .andReturn();
 
+        var expected = taskStatusRepository.findAll().stream().map(taskStatusMapper::map).toList();
         var body = result.getResponse().getContentAsString();
-        assertThatJson(body).isArray();
+        assertThatJson(body).isArray().hasSize(expected.size());
+
+        List<TaskStatusDTO> userDTOs = om.readValue(body, new TypeReference<>() {
+        });
+        assertThat(userDTOs).containsExactlyInAnyOrderElementsOf(expected);
     }
 
     @Test

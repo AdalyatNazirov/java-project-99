@@ -1,6 +1,8 @@
 package hexlet.code.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.dto.UserDTO;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
@@ -20,6 +22,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,8 +76,13 @@ public class UserControllerTests {
                 .andExpect(status().isOk())
                 .andReturn();
 
+        var expected = userRepository.findAll().stream().map(userMapper::map).toList();
         var body = result.getResponse().getContentAsString();
-        assertThatJson(body).isArray();
+        assertThatJson(body).isArray().hasSize(expected.size());
+
+        List<UserDTO> userDTOs = om.readValue(body, new TypeReference<>() {
+        });
+        assertThat(userDTOs).containsExactlyInAnyOrderElementsOf(expected);
     }
 
     @Test
