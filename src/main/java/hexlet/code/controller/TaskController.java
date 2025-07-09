@@ -28,11 +28,11 @@ import java.util.List;
 @AllArgsConstructor
 public class TaskController {
 
-    private TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
 
-    private TaskMapper taskMapper;
+    private final TaskMapper taskMapper;
 
-    private TaskSpecification taskSpecification;
+    private final TaskSpecification taskSpecification;
 
     @GetMapping
     public ResponseEntity<List<TaskDTO>> list(TaskListDTO params) {
@@ -51,7 +51,7 @@ public class TaskController {
     public TaskDTO show(@PathVariable Long id) {
         var task = taskRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id " + id + " not found"));
         return taskMapper.map(task);
     }
 
@@ -67,7 +67,7 @@ public class TaskController {
     public TaskDTO update(@PathVariable Long id, @RequestBody TaskUpdateDTO taskUpdateDto) {
         var task = taskRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id " + id + " not found"));
         taskMapper.update(taskUpdateDto, task);
         var result = taskRepository.save(task);
         return taskMapper.map(result);

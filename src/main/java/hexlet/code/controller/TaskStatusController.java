@@ -26,9 +26,9 @@ import java.util.List;
 @AllArgsConstructor
 public class TaskStatusController {
 
-    private TaskStatusRepository taskStatusRepository;
+    private final TaskStatusRepository taskStatusRepository;
 
-    private TaskStatusMapper taskStatusMapper;
+    private final TaskStatusMapper taskStatusMapper;
 
     @GetMapping
     public ResponseEntity<List<TaskStatusDTO>> list() {
@@ -45,7 +45,7 @@ public class TaskStatusController {
     public TaskStatusDTO show(@PathVariable Long id) {
         var taskStatus = taskStatusRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task Status not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Task Status with id " + id + " not found"));
         return taskStatusMapper.map(taskStatus);
     }
 
@@ -61,7 +61,7 @@ public class TaskStatusController {
     public TaskStatusDTO update(@PathVariable Long id, @Valid @RequestBody TaskStatusUpdateDTO taskStatusUpdateDto) {
         var taskStatus = taskStatusRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task Status not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Task Status with id " + id + " not found"));
         taskStatusMapper.update(taskStatusUpdateDto, taskStatus);
         taskStatusRepository.save(taskStatus);
         return taskStatusMapper.map(taskStatus);

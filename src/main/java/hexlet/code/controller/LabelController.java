@@ -6,7 +6,7 @@ import hexlet.code.dto.LabelUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.LabelMapper;
 import hexlet.code.repository.LabelRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,13 +23,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("${base-url:/api}" + "/labels")
+@AllArgsConstructor
 public class LabelController {
 
-    @Autowired
-    private LabelRepository labelRepository;
+    private final LabelRepository labelRepository;
 
-    @Autowired
-    private LabelMapper labelMapper;
+    private final LabelMapper labelMapper;
 
     @GetMapping
     public ResponseEntity<List<LabelDTO>> list() {
@@ -46,7 +45,7 @@ public class LabelController {
     public LabelDTO show(@PathVariable Long id) {
         var label = labelRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Label not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Label with id " + id + " not found"));
         return labelMapper.map(label);
     }
 
@@ -62,7 +61,7 @@ public class LabelController {
     public LabelDTO update(@PathVariable Long id, @RequestBody LabelUpdateDTO labelDto) {
         var label = labelRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Label not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Label with id " + id + " not found"));
 
         labelMapper.update(labelDto, label);
         labelRepository.save(label);

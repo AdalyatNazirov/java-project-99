@@ -3,16 +3,16 @@ package hexlet.code.mapper;
 import hexlet.code.model.BaseEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+import jakarta.persistence.PersistenceContext;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.TargetType;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(
         componentModel = MappingConstants.ComponentModel.SPRING
 )
 public abstract class SlugMapper {
-    @Autowired
+    @PersistenceContext
     private EntityManager entityManager;
 
     public <T extends BaseEntity> T toEntity(String slug, @TargetType Class<T> entityClass) {

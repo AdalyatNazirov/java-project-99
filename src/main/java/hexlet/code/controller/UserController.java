@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,9 +28,9 @@ import java.util.List;
 @AllArgsConstructor
 public class UserController {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
     @GetMapping()
     public ResponseEntity<List<UserDTO>> list() {
@@ -43,7 +44,7 @@ public class UserController {
     public UserDTO show(@PathVariable Long id) {
         var user = userRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
         return userMapper.map(user);
     }
 
@@ -58,15 +59,17 @@ public class UserController {
 
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@userUtils.isCurrentUser(#id)")
     public void destroy(@PathVariable Long id) {
         userRepository.deleteById(id);
     }
 
     @PutMapping(path = "/{id}")
+    @PreAuthorize("@userUtils.isCurrentUser(#id)")
     public UserDTO update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO userUpdateDto) {
         var user = userRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
 
         if (userUpdateDto.getPasswordDigest() != null) {
             userMapper.update(userUpdateDto, user);
