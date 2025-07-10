@@ -70,11 +70,6 @@ public class UserController {
         var user = userRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
-
-        if (userUpdateDto.getPasswordDigest() != null) {
-            userMapper.update(userUpdateDto, user);
-        }
-
         userMapper.update(userUpdateDto, user);
         var result = userRepository.save(user);
         return userMapper.map(result);
