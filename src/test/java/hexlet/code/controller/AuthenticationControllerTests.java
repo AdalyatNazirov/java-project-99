@@ -2,6 +2,14 @@ package hexlet.code.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.AuthRequest;
+import hexlet.code.dto.UserCreateDTO;
+import hexlet.code.mapper.UserMapper;
+import hexlet.code.model.User;
+import hexlet.code.repository.UserRepository;
+import hexlet.code.util.ModelGenerator;
+import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,12 +31,41 @@ public class AuthenticationControllerTests {
     @Autowired
     private ObjectMapper om;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    private User testUser;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private ModelGenerator modelGenerator;
+
+    @BeforeEach
+    public void setUp() {
+        testUser = Instancio.of(modelGenerator.getUserModel()).create();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        userRepository.deleteAll();
+        userRepository.flush();
+    }
+
     @Test
     public void testLogin() throws Exception {
+        UserCreateDTO userDto = new UserCreateDTO();
+        userDto.setFirstName(testUser.getFirstName());
+        userDto.setLastName(testUser.getLastName());
+        userDto.setEmail(testUser.getEmail());
+        userDto.setPasswordDigest(testUser.getPasswordDigest());
+
+        userRepository.save(userMapper.map(userDto));
 
         var authRequest = new AuthRequest();
-        authRequest.setUsername("hexlet@example.com");
-        authRequest.setPassword("qwerty");
+        authRequest.setUsername(testUser.getEmail());
+        authRequest.setPassword(testUser.getPasswordDigest());
 
         var request = post("/api/login")
                 .contentType(MediaType.APPLICATION_JSON)

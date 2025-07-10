@@ -11,6 +11,7 @@ import hexlet.code.repository.LabelRepository;
 import hexlet.code.util.ModelGenerator;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 public class LabelControllerTests {
     @Autowired
     private WebApplicationContext wac;
@@ -70,6 +70,12 @@ public class LabelControllerTests {
                 .build();
 
         testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        labelRepository.deleteAll();
+        labelRepository.flush();
     }
 
     @Test

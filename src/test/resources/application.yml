@@ -18,6 +18,8 @@ spring:
     bean:
       validation:
         enabled: true
+  profiles:
+    active: test
 
   jpa:
     show-sql: true

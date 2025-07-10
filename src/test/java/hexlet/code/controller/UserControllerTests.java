@@ -9,6 +9,7 @@ import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,12 @@ public class UserControllerTests {
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
     }
 
+    @AfterEach
+    public void tearDown() {
+        userRepository.deleteAll();
+        userRepository.flush();
+    }
+
     @Test
     public void testIndex() throws Exception {
         userRepository.save(testUser);
@@ -114,19 +121,38 @@ public class UserControllerTests {
     @Test
     public void testCreate() throws Exception {
 
-        var anotherUser = Instancio.of(modelGenerator.getUserModel()).create();
-        anotherUser.setPasswordDigest(null);
+        var request = post("/api/users").with(jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(testUser));
+
+        var result = mockMvc.perform(request)
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        var body = result.getResponse().getContentAsString();
+
+        assertThatJson(body).and(
+                v -> v.node("firstName").isEqualTo(testUser.getFirstName()),
+                v -> v.node("lastName").isEqualTo(testUser.getLastName()),
+                v -> v.node("email").isEqualTo(testUser.getEmail())
+        );
+    }
+
+    @Test
+    public void failsCreateWhenPasswordIsNull() throws Exception {
+
+        testUser.setPasswordDigest(null);
 
         var request = post("/api/users").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(anotherUser));
+                .content(om.writeValueAsString(testUser));
 
         mockMvc.perform(request)
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void failedCreateWithNullPassword() throws Exception {
+    public void failsCreateWithNullPassword() throws Exception {
 
         var request = post("/api/users").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -157,7 +183,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void failDestroyWhenOtherUserId() throws Exception {
+    public void failsDestroyWhenOtherUserId() throws Exception {
         var user = userRepository.save(testUser);
 
         Long id = 11L;
@@ -194,7 +220,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void failUpdateOtherUser() throws Exception {
+    public void failsUpdateOtherUser() throws Exception {
         var user = userRepository.save(testUser);
 
         var dto = userMapper.map(testUser);

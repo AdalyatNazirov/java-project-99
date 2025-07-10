@@ -16,6 +16,7 @@ import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
@@ -44,7 +44,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 public class TaskControllerTests {
 
     @Autowired
@@ -64,6 +63,9 @@ public class TaskControllerTests {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private LabelRepository labelRepository;
+
     private Task testTask;
     private TaskStatus testTaskStatus;
     private User testUser;
@@ -75,9 +77,6 @@ public class TaskControllerTests {
     @Autowired
     private ObjectMapper om;
 
-    @Autowired
-    private LabelRepository labelRepository;
-
     @BeforeEach
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
@@ -85,16 +84,30 @@ public class TaskControllerTests {
                 .apply(springSecurity())
                 .build();
 
-        testTaskStatus = taskStatusRepository.findBySlug("draft").get();
+        testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
+        taskStatusRepository.save(testTaskStatus);
 
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
         userRepository.save(testUser);
 
-        testLabel = labelRepository.findByName("bug").get();
+        testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        labelRepository.save(testLabel);
 
         testTask = Instancio.of(modelGenerator.getTaskModel()).create();
         testTask.setTaskStatus(testTaskStatus);
         testTask.setAssignee(testUser);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        taskRepository.deleteAll();
+        labelRepository.deleteAll();
+        taskStatusRepository.deleteAll();
+        userRepository.deleteAll();
+        taskRepository.flush();
+        labelRepository.flush();
+        taskStatusRepository.flush();
+        userRepository.flush();
     }
 
     @Test
@@ -117,7 +130,9 @@ public class TaskControllerTests {
     public void testListWithFilter() throws Exception {
         taskRepository.save(testTask);
 
-        var anotherStatus = taskStatusRepository.findBySlug("to_review").get();
+
+        var anotherStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
+        taskStatusRepository.save(anotherStatus);
 
         var anotherTask = Instancio.of(modelGenerator.getTaskModel()).create();
         anotherTask.setTaskStatus(anotherStatus);
