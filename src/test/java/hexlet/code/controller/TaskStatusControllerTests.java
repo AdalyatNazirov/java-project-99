@@ -7,9 +7,9 @@ import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.util.ModelGenerator;
+import hexlet.code.util.TestDataCleaner;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +59,9 @@ public class TaskStatusControllerTests {
     @Autowired
     private Faker faker;
 
+    @Autowired
+    private TestDataCleaner testDataCleaner;
+
     @BeforeEach
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
@@ -66,11 +69,12 @@ public class TaskStatusControllerTests {
                 .apply(springSecurity())
                 .build();
 
+        testDataCleaner.cleanAll();
+
         testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
     }
 
-    @AfterEach
-    public void tearDown() {
+    private void clearDb() {
         taskStatusRepository.deleteAll();
         taskStatusRepository.flush();
     }
@@ -195,5 +199,13 @@ public class TaskStatusControllerTests {
 
         assertThat(taskStatus.getName()).isEqualTo(testTaskStatus.getName());
         assertThat(taskStatus.getSlug()).isEqualTo(dto.get("slug"));
+    }
+
+    public TestDataCleaner getTestDataCleaner() {
+        return testDataCleaner;
+    }
+
+    public void setTestDataCleaner(TestDataCleaner testDataCleaner) {
+        this.testDataCleaner = testDataCleaner;
     }
 }

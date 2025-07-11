@@ -9,11 +9,13 @@ import hexlet.code.mapper.LabelMapper;
 import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.util.ModelGenerator;
+import hexlet.code.util.TestDataCleaner;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -61,6 +63,9 @@ public class LabelControllerTests {
     @Autowired
     private Faker faker;
 
+    @Autowired
+    private TestDataCleaner testDataCleaner;
+
     @BeforeEach
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
@@ -68,13 +73,9 @@ public class LabelControllerTests {
                 .apply(springSecurity())
                 .build();
 
-        testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
-    }
+        testDataCleaner.cleanAll();
 
-    @AfterEach
-    public void tearDown() {
-        labelRepository.deleteAll();
-        labelRepository.flush();
+        testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
     }
 
     @Test

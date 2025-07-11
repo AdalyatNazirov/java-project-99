@@ -12,9 +12,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,9 +40,9 @@ public abstract class TaskMapper {
     public abstract void update(TaskUpdateDTO taskStatusUpdateDTO, @MappingTarget Task taskStatus);
 
 
-    protected List<Label> mapLabelIds(Set<Long> labelIds) {
+    protected Set<Label> mapLabelIds(Set<Long> labelIds) {
         if (labelIds == null) {
-            return new ArrayList<>();
+            return new HashSet<>();
         }
         return labelIds.stream()
                 .map(id -> {
@@ -52,10 +50,10 @@ public abstract class TaskMapper {
                     label.setId(id);
                     return label;
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
-    protected Set<Long> mapLabels(List<Label> labels) {
+    protected Set<Long> mapLabels(Set<Label> labels) {
         if (labels == null) {
             return new HashSet<>();
         }

@@ -7,9 +7,9 @@ import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
+import hexlet.code.util.TestDataCleaner;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
@@ -37,7 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 public class UserControllerTests {
     @Autowired
     private WebApplicationContext wac;
@@ -57,8 +55,12 @@ public class UserControllerTests {
 
     @Autowired
     private UserMapper userMapper;
+
     @Autowired
     private Faker faker;
+
+    @Autowired
+    private TestDataCleaner testDataCleaner;
 
     @BeforeEach
     public void setUp() {
@@ -67,11 +69,12 @@ public class UserControllerTests {
                 .apply(springSecurity())
                 .build();
 
+        testDataCleaner.cleanAll();
+
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
     }
 
-    @AfterEach
-    public void tearDown() {
+    private void clearDb() {
         userRepository.deleteAll();
         userRepository.flush();
     }

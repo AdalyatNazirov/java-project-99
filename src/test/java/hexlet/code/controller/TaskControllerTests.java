@@ -15,8 +15,8 @@ import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
+import hexlet.code.util.TestDataCleaner;
 import org.instancio.Instancio;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,12 +77,17 @@ public class TaskControllerTests {
     @Autowired
     private ObjectMapper om;
 
+    @Autowired
+    private TestDataCleaner testDataCleaner;
+
     @BeforeEach
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
                 .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
                 .apply(springSecurity())
                 .build();
+
+        testDataCleaner.cleanAll();
 
         testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
         taskStatusRepository.save(testTaskStatus);
@@ -98,8 +103,7 @@ public class TaskControllerTests {
         testTask.setAssignee(testUser);
     }
 
-    @AfterEach
-    public void tearDown() {
+    private void cleanDb() {
         taskRepository.deleteAll();
         labelRepository.deleteAll();
         taskStatusRepository.deleteAll();

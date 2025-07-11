@@ -7,10 +7,12 @@ import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
+import hexlet.code.util.TestDataCleaner;
 import org.instancio.Instancio;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,13 +44,17 @@ public class AuthenticationControllerTests {
     @Autowired
     private ModelGenerator modelGenerator;
 
+    @Autowired
+    private TestDataCleaner testDataCleaner;
+
     @BeforeEach
     public void setUp() {
+        testDataCleaner.cleanAll();
+
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
     }
 
-    @AfterEach
-    public void tearDown() {
+    private void clearDb() {
         userRepository.deleteAll();
         userRepository.flush();
     }
