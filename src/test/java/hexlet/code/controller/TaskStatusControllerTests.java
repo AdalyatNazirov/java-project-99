@@ -74,11 +74,6 @@ public class TaskStatusControllerTests {
         testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
     }
 
-    private void clearDb() {
-        taskStatusRepository.deleteAll();
-        taskStatusRepository.flush();
-    }
-
     @Test
     public void testIndex() throws Exception {
         taskStatusRepository.save(testTaskStatus);

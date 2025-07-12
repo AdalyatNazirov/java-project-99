@@ -52,11 +52,6 @@ public class AuthenticationControllerTests {
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
     }
 
-    private void clearDb() {
-        userRepository.deleteAll();
-        userRepository.flush();
-    }
-
     @Test
     public void testLogin() throws Exception {
         UserCreateDTO userDto = new UserCreateDTO();

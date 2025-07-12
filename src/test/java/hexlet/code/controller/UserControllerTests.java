@@ -74,11 +74,6 @@ public class UserControllerTests {
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
     }
 
-    private void clearDb() {
-        userRepository.deleteAll();
-        userRepository.flush();
-    }
-
     @Test
     public void testIndex() throws Exception {
         userRepository.save(testUser);
