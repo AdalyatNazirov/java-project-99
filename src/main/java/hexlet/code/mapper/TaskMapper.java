@@ -5,12 +5,14 @@ import hexlet.code.dto.TaskDTO;
 import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
+import lombok.NoArgsConstructor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,19 +41,7 @@ public abstract class TaskMapper {
     @Mapping(target = "labels", source = "labelIds")
     public abstract void update(TaskUpdateDTO taskStatusUpdateDTO, @MappingTarget Task taskStatus);
 
-
-    protected Set<Label> mapLabelIds(Set<Long> labelIds) {
-        if (labelIds == null) {
-            return new HashSet<>();
-        }
-        return labelIds.stream()
-                .map(id -> {
-                    Label label = new Label();
-                    label.setId(id);
-                    return label;
-                })
-                .collect(Collectors.toSet());
-    }
+    protected abstract Set<Label> mapLabelIds(Set<Long> value);
 
     protected Set<Long> mapLabels(Set<Label> labels) {
         if (labels == null) {
