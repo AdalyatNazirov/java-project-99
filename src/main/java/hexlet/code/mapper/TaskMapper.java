@@ -5,14 +5,12 @@ import hexlet.code.dto.TaskDTO;
 import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
-import lombok.NoArgsConstructor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 import java.util.Set;
